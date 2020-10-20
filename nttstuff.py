@@ -24,6 +24,11 @@ def naive_ntt(inp, P, omegas):
     return ret
 
 
+def _data(arr, bitwidth=32):
+    """Make a FuTIL-ready JSON data dict."""
+    return {'data': arr, 'bitwidth': bitwidth}
+
+
 def main(n, dump):
     p = find_prime(n)
 
@@ -45,9 +50,10 @@ def main(n, dump):
 
     if dump:
         print(json.dumps({
-            'a': a,
-            'p': p,
-            'omegas': omegas,
+            'inp0': _data(a),
+            'prime0': _data([p]),
+            'omegas0': _data(omegas),
+            'ret0': _data([0] * n),
         }, indent=2, sort_keys=True))
         return
 

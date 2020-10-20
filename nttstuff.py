@@ -53,7 +53,7 @@ def gen_omegas(n, p):
     return omegas
 
 
-def run_ntt(n, dump, indata=None):
+def run_ntt(n, dump_input, dump_output, indata=None):
     if indata:
         p = indata['prime0']['data'][0]
         a = indata['inp0']['data']
@@ -69,12 +69,12 @@ def run_ntt(n, dump, indata=None):
     else:
         omegas = gen_omegas(n, p)
 
-    if dump:
+    if dump_input:
         print(json.dumps({
             'inp0': _data(a),
             'prime0': _data([p]),
             'omegas0': _data(omegas),
-            'ret0': _data([0] * n),
+            'ret0': sympy_res if dump_output else _data([0] * n),
         }, indent=2, sort_keys=True))
         return
 
@@ -90,6 +90,8 @@ def main():
     parser.add_argument('-d', dest='dump', action='store_true', default=False,
                         help='dump inputs')
     parser.add_argument('-i', dest='input', default=None, help='input data')
+    parser.add_argument('-o', dest='output', action='store_true',
+                        default=False, help='dump results (requires -d)')
     args = parser.parse_args()
 
     if args.input:
@@ -98,7 +100,7 @@ def main():
     else:
         indata = None
 
-    run_ntt(args.num, args.dump, indata)
+    run_ntt(args.num, args.dump, args.output, indata)
 
 
 if __name__ == '__main__':

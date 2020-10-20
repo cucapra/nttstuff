@@ -3,6 +3,7 @@ from sympy.ntheory import isprime, primitive_root
 import random
 import sys
 import json
+import argparse
 
 
 def find_prime(n):
@@ -70,13 +71,14 @@ def run_ntt(n, dump):
 
 
 def main():
-    args = sys.argv[1:]
-    if '-d' in args:
-        dump = True
-        args.remove('-d')
-    else:
-        dump = False
-    run_ntt(int(args[0]) if args else 2048, dump)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('num', metavar='N', type=int, nargs='?',
+                        default=2048, help='input size')
+    parser.add_argument('-d', dest='dump', action='store_true', default=False,
+                        help='dump inputs')
+    args = parser.parse_args()
+
+    run_ntt(args.num, args.dump)
 
 
 if __name__ == '__main__':

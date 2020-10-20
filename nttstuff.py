@@ -29,11 +29,18 @@ def _data(arr, bitwidth=32):
     return {'data': arr, 'bitwidth': bitwidth}
 
 
-def main(n, dump):
-    p = find_prime(n)
+def check_eq(a, b):
+    """Assert that two arrays are equal everywhere."""
+    for i, (x, y) in enumerate(zip(a, b)):
+        assert x == y, 'difference at element {}'.format(i)
+    print('ok!')
 
+
+def run_ntt(n, dump):
+    p = find_prime(n)
     a = [random.randint(0, 1000) for _ in range(n)]
 
+    # SymPy's NTT generates omega stuff internally.
     sympy_res = ntt(a, prime=p)
 
     # Generate an omega: g^k (mod p) for a generator of the field, g.
@@ -41,7 +48,7 @@ def main(n, dump):
     k = (p - 1) // n
     omega = (g ** k) % p
 
-    # Generate pre-computed omega array.
+    # Generate pre-computed omega array (also from Shunning).
     omegas = [1]
     for i in range(n):
         omegas.append(omegas[i] * omega % p)
@@ -59,16 +66,18 @@ def main(n, dump):
 
     naive_res = naive_ntt(a, p, omegas)
 
-    for i, (x, y) in enumerate(zip(sympy_res, naive_res)):
-        assert x == y, 'difference at element {}'.format(i)
-    print('ok!')
+    check_eq(naive_res, sympy_res)
 
 
-if __name__ == '__main__':
+def main():
     args = sys.argv[1:]
     if '-d' in args:
         dump = True
         args.remove('-d')
     else:
         dump = False
-    main(int(args[0]) if args else 2048, dump)
+    run_ntt(int(args[0]) if args else 2048, dump)
+
+
+if __name__ == '__main__':
+    main()

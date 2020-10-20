@@ -1,6 +1,8 @@
 from sympy.discrete.transforms import ntt
 from sympy.ntheory import isprime, primitive_root
 import random
+import sys
+import json
 
 
 def find_prime(n):
@@ -22,7 +24,7 @@ def naive_ntt(inp, P, omegas):
     return ret
 
 
-def main(n=2048):
+def main(n, dump):
     p = find_prime(n)
 
     a = [random.randint(0, 1000) for _ in range(n)]
@@ -41,6 +43,14 @@ def main(n=2048):
     for i in range(n):
         assert omegas[n - i] * omegas[i] % p == 1
 
+    if dump:
+        print(json.dumps({
+            'a': a,
+            'p': p,
+            'omegas': omegas,
+        }, indent=2, sort_keys=True))
+        return
+
     naive_res = naive_ntt(a, p, omegas)
 
     for i, (x, y) in enumerate(zip(sympy_res, naive_res)):
@@ -49,4 +59,10 @@ def main(n=2048):
 
 
 if __name__ == '__main__':
-    main()
+    args = sys.argv[1:]
+    if '-d' in args:
+        dump = True
+        args.remove('-d')
+    else:
+        dump = False
+    main(int(args[0]) if args else 2048, dump)

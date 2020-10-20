@@ -1,7 +1,6 @@
 from sympy.discrete.transforms import ntt
 from sympy.ntheory import isprime, primitive_root
 import random
-import sys
 import json
 import argparse
 
@@ -37,13 +36,7 @@ def check_eq(a, b):
     print('ok!')
 
 
-def run_ntt(n, dump):
-    p = find_prime(n)
-    a = [random.randint(0, 1000) for _ in range(n)]
-
-    # SymPy's NTT generates omega stuff internally.
-    sympy_res = ntt(a, prime=p)
-
+def gen_omegas(n, p):
     # Generate an omega: g^k (mod p) for a generator of the field, g.
     g = primitive_root(p)
     k = (p - 1) // n
@@ -55,6 +48,26 @@ def run_ntt(n, dump):
         omegas.append(omegas[i] * omega % p)
     for i in range(n):
         assert omegas[n - i] * omegas[i] % p == 1
+    omegas = omegas[:n]  # Drop the last, needless value.
+
+    return omegas
+
+
+def run_ntt(n, dump, indata=None):
+    if indata:
+        p = indata['prime0']['data'][0]
+        a = indata['inp0']['data']
+    else:
+        p = find_prime(n)
+        a = [random.randint(0, 1000) for _ in range(n)]
+
+    # SymPy's NTT generates omega stuff internally.
+    sympy_res = ntt(a, prime=p)
+
+    if indata:
+        omegas = indata['omegas0']['data']
+    else:
+        omegas = gen_omegas(n, p)
 
     if dump:
         print(json.dumps({
@@ -76,9 +89,16 @@ def main():
                         default=2048, help='input size')
     parser.add_argument('-d', dest='dump', action='store_true', default=False,
                         help='dump inputs')
+    parser.add_argument('-i', dest='input', default=None, help='input data')
     args = parser.parse_args()
 
-    run_ntt(args.num, args.dump)
+    if args.input:
+        with open(args.input) as f:
+            indata = json.load(f)
+    else:
+        indata = None
+
+    run_ntt(args.num, args.dump, indata)
 
 
 if __name__ == '__main__':

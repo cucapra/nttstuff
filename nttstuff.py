@@ -33,7 +33,10 @@ def cooley_tukey_ntt(inp, P, omegas):
 
     for i in range(N):
         rev_i = reverse_bits(i, bit_length)
-        if rev_i > i: ret[i], ret[rev_i] = ret[rev_i], ret[i]
+        if rev_i > i:
+            ret[i] ^= ret[rev_i]
+            ret[rev_i] ^= ret[i]
+            ret[i] ^= ret[rev_i]
 
     M = 2
     iters = int(math.log2(N))

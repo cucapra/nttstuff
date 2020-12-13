@@ -1,6 +1,7 @@
 from sympy.discrete.transforms import ntt
 from sympy.ntheory import isprime, primitive_root
 import random
+import math
 import json
 import argparse
 
@@ -24,6 +25,36 @@ def naive_ntt(inp, P, omegas):
     return ret
 
 
+def cooley_tukey_ntt(inp, P, omegas):
+    """Cooley-Tukey NTT algorithm."""
+    ret = inp
+    N = len(ret)
+    bit_length = N.bit_length() - 1
+
+    for i in range(N):
+        rev_i = reverse_bits(i, bit_length)
+        if rev_i > i:
+            ret[i] ^= ret[rev_i]
+            ret[rev_i] ^= ret[i]
+            ret[i] ^= ret[rev_i]
+
+    M = 2
+    iters = int(math.log2(N))
+    for _ in range(iters):
+        for i in range(0, N, M):
+            g = 0
+            for j in range(0, M // 2):
+                k = i + j + (M // 2)
+                U = ret[i + j]
+                V = ret[k] * omegas[g]
+                ret[i + j] = (U + V) % P
+                ret[k] = (U - V) % P
+                g = g + N // M
+        M = M * 2
+
+    return ret
+
+
 def _data(arr, bitwidth=32):
     """Make a FuTIL-ready JSON data dict."""
     return {'data': arr, 'bitwidth': bitwidth}
@@ -32,7 +63,7 @@ def _data(arr, bitwidth=32):
 def check_eq(a, b):
     """Assert that two arrays are equal everywhere."""
     for i, (x, y) in enumerate(zip(a, b)):
-        assert x == y, 'difference at element {}'.format(i)
+        assert x == y, f'difference at element {i}: {x}, {y}'
     print('ok!')
 
 
@@ -51,6 +82,14 @@ def gen_omegas(n, p):
     omegas = omegas[:n]  # Drop the last, needless value.
 
     return omegas
+
+
+def reverse_bits(number, bit_length):
+    # Reverses the bits of `number` up to `bit_length`.
+    reversed = 0
+    for i in range(0, bit_length):
+        if (number >> i) & 1: reversed |= 1 << (bit_length - 1 - i)
+    return reversed
 
 
 def run_ntt(n, dump_input, dump_output, indata=None):
@@ -79,8 +118,10 @@ def run_ntt(n, dump_input, dump_output, indata=None):
         return
 
     naive_res = naive_ntt(a, p, omegas)
+    cooley_tukey_res = cooley_tukey_ntt(a, p, omegas)
 
-    check_eq(naive_res, sympy_res)
+    check_eq(sympy_res, cooley_tukey_res)
+    check_eq(sympy_res, naive_res)
 
 
 def main():

@@ -13,20 +13,22 @@ def gen_omegas(n, q):
     # Generate an omega: g^k (mod q) for a generator of the field, g.
     g = primitive_root(q)
     k = (q - 1) // n
+    print(q, k)
     omega = (g ** k) % q
+    assert 0 <= omega and omega < q
 
     # Generate pre-computed omega array (also from Shunning).
     omegas = [1]
     for i in range(n):
-        omegas.append(omegas[i] * omega % q)
+        omegas.append((omegas[i] * omega) % q)
     for i in range(n):
-        assert omegas[n - i] * omegas[i] % q == 1
+        assert (omegas[n - i] * omegas[i]) % q == 1
     omegas = omegas[:n]  # Drop the last, needless value.
 
     return omegas
 
 
-def get_omegas_inversed(omegas, q):
+def inversed(omegas, q):
     def multiplicative_inverse(a, q):
         # We want to find `i` such that `(x * i) mod q == 1`,
         # which which is guaranteed if `x` is a unit of the

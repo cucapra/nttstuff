@@ -65,7 +65,8 @@ def gentleman_sande_intt_opt(inp, n, q, inv_phis):
         t <<= 1
         m >>= 1
 
-    return [(i // n) % q for i in a]
+    shift_n = int(math.log2(n))
+    return [(i >> shift_n) % q for i in a]
 
 
 def get_bit_reversed(c, n, q):

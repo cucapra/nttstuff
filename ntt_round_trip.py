@@ -161,8 +161,8 @@ def round_trip_ntt(n, input_upper_bound):
     ntt_res = cooley_tukey_ntt_opt(a, n, q, br_phis)
 
     inv_phis = inversed(phis, q)
-    inv_phis = get_bit_reversed(inv_phis, n, q)
-    intt_res = gentleman_sande_intt_opt(ntt_res, n, q, inv_phis)
+    br_inv_phis = get_bit_reversed(inv_phis, n, q)
+    intt_res = gentleman_sande_intt_opt(ntt_res, n, q, br_inv_phis)
 
     check_eq(a, intt_res)
 

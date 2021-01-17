@@ -168,4 +168,4 @@ def round_trip_ntt(n, input_upper_bound):
 
 
 if __name__ == '__main__':
-    round_trip_ntt(n=1024, input_upper_bound=10)
+    round_trip_ntt(n=1024, input_upper_bound=1000)

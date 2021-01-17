@@ -84,7 +84,7 @@ def gen_phis(omegas, q):
         return pow(x, (q - 1) // 2, q)
 
     def tonelli_shanks(x, q):
-        # Finds the square-root of `x mod q`.
+        # Finds the `sqrt(x) mod q`.
         # Source: https://rosettacode.org/wiki/Tonelli-Shanks_algorithm
         Q = q - 1
         s = 0

@@ -10,7 +10,7 @@ def cooley_tukey_ntt_opt(inp, n, q, omegas):
     pre-computing the omegas in bit-reversed order.
 
     Requires:
-     `omegas` are provied in bit-reversed order.
+     `omegas` are provided in bit-reversed order.
      `n` is a power of two.
      `q` is equivalent to `1 mod 2n`.
 

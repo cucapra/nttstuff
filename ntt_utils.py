@@ -13,7 +13,6 @@ def gen_omegas(n, q):
     # Generate an omega: g^k (mod q) for a generator of the field, g.
     g = primitive_root(q)
     k = (q - 1) // n
-    print(q, k)
     omega = (g ** k) % q
     assert 0 <= omega and omega < q
 

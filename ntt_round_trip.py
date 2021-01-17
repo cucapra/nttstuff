@@ -52,7 +52,7 @@ def gentleman_sande_intt_opt(inp, n, q, inv_phis):
     m = n
     while (m > 1):
         j1 = 0
-        h = m // 2
+        h = m >> 1
         for i in range(h):
             j2 = j1 + t - 1
             S = inv_phis[h + i]
@@ -61,9 +61,9 @@ def gentleman_sande_intt_opt(inp, n, q, inv_phis):
                 V = a[j + t]
                 a[j] = (U + V) % q
                 a[j + t] = ((U - V) * S) % q
-            j1 = j1 + t * 2
-        t *= 2
-        m //= 2
+            j1 += (t << 1)
+        t <<= 1
+        m >>= 1
 
     return [(i // n) % q for i in a]
 
@@ -150,11 +150,10 @@ def round_trip_ntt(n, input_upper_bound):
     """
 
     # Pick a sufficiently large minimum modulus to avoid overflow.
-    min_modulus = input_upper_bound * n + 1
+    min_modulus = input_upper_bound * n
     q = find_modulus(n, min_modulus)
 
     a = [random.randint(0, input_upper_bound) for _ in range(n)]
-    # q = 12289
 
     omegas = gen_omegas(n, q)
     phis = gen_phis(omegas, q)
@@ -169,4 +168,4 @@ def round_trip_ntt(n, input_upper_bound):
 
 
 if __name__ == '__main__':
-    round_trip_ntt(n=16, input_upper_bound=1000)
+    round_trip_ntt(n=1024, input_upper_bound=10)

@@ -1,7 +1,7 @@
 nttstuff
 ========
 
-Just some experiments with the number theoretic transform (NTT). To get started:
+Here are a few experiments with the number theoretic transform (NTT), including reference and optimized. To get started:
 
     $ pip install --user sympy
 
